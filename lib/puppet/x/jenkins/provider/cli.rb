@@ -182,11 +182,15 @@ class Puppet::X::Jenkins::Provider::Cli < Puppet::Provider
     cli_password_file_exists = config[:cli_password_file_exists]
     cli_remoting_free        = config[:cli_remoting_free]
 
+    Puppet.debug("cli_remoting_free: #{cli_remoting_free}")
+    Puppet.debug("command:           #{command}")
+    remoting = cli_remoting_free && (command.include? 'groovy') ? '-remoting' : ''
     base_cmd = cli_pre_cmd + [
       command(:java),
       '-jar', cli_jar,
+      remoting,
       '-s', url,
-    ]
+    ].reject(&:empty?)
 
     cli_cmd = base_cmd + [command]
     cli_cmd.flatten!
